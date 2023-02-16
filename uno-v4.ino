@@ -9,7 +9,7 @@ SoftwareSerial BLUETOOTH_SERIAL(0, 1); // RX, TX pins for HC-05
 MPU6050 accel_gyro;
 
 bool DOOR_HANDLE_STATE = false;
-int AX, ay, AZ;
+int AX, AY, AZ;
 int GX, GY, GZ;
 const int THRESHOLD = 15000;
 const int ACCEL_X_THRESHOLD = 464;
@@ -47,7 +47,7 @@ void pair_bluetooth() {
 
   // Attempt to pair with the Bluetooth module
   BLUETOOTH_SERIAL.print("AT");
-  delay(500);
+  delAY(500);
   if (BLUETOOTH_SERIAL.available()) {
     String response = BLUETOOTH_SERIAL.readString();
     if (response.startsWith("OK")) {
@@ -58,23 +58,10 @@ void pair_bluetooth() {
   }
 }
 
-void run_bluetooth() {
-  if (BLUETOOTH_SERIAL.available()) {
-    char c = BLUETOOTH_SERIAL.read();
-    Serial.write(c);
-  }
-
-  if (Serial.available()) {
-    char c = Serial.read();
-    BLUETOOTH_SERIAL.write(c);
-  }
-}
-
-
-void display_status(float TEMPERATURE, bool SWITCH_STATE, bool PIR_STATE) {
+void displAY_status(float TEMPERATURE, bool SWITCH_STATE, bool PIR_STATE) {
   char CURRENT_TIME[20];
   sprintf(CURRENT_TIME, "%04d-%02d-%02d %02d:%02d:%02d", 
-    year(), month(), day(), hour(), minute(), second());
+    year(), month(), dAY(), hour(), minute(), second());
   
   Serial.println(CURRENT_TIME);
   Serial.print("Temperature: ");
@@ -114,7 +101,7 @@ void door_intrusion() {
     digitalWrite(MOTOR_PIN1, HIGH);
     digitalWrite(MOTOR_PIN2, LOW);
     analogWrite(ENABLE_PIN, 255);
-    delay(3000);
+    delAY(3000);
 }
 
 void door_normal() {
@@ -125,12 +112,12 @@ void door_normal() {
     analogWrite(GREEN_PIN, 0);
     analogWrite(BLUE_PIN, 0);
     analogWrite(ENABLE_PIN, 0);
-    delay(1000);
+    delAY(1000);
 }
 
 void loop() {
-    accel_gyro.getMotion6(&AX, &ay, &AZ, &GX, &GY, &GZ);
-    bool NEW_STATE = (GX < GYRO_X_THRESHOLD - THRESHOLD || GX > GYRO_X_THRESHOLD + THRESHOLD) || (GY < GYRO_Y_THRESHOLD - THRESHOLD || GY > GYRO_Y_THRESHOLD + THRESHOLD) || (GZ < GYRO_Z_THRESHOLD - THRESHOLD || GZ > GYRO_Z_THRESHOLD + THRESHOLD) || (AX < ACCEL_X_THRESHOLD - THRESHOLD || AX > ACCEL_X_THRESHOLD + THRESHOLD) || (AY < ACCEL_Y_THRESHOLD - THRESHOLD || ay > ACCEL_Y_THRESHOLD + THRESHOLD) || (AZ < ACCEL_Z_THRESHOLD - THRESHOLD || AZ > ACCEL_Z_THRESHOLD + THRESHOLD);
+    accel_gyro.getMotion6(&AX, &AY, &AZ, &GX, &GY, &GZ);
+    bool NEW_STATE = (GX < GYRO_X_THRESHOLD - THRESHOLD || GX > GYRO_X_THRESHOLD + THRESHOLD) || (GY < GYRO_Y_THRESHOLD - THRESHOLD || GY > GYRO_Y_THRESHOLD + THRESHOLD) || (GZ < GYRO_Z_THRESHOLD - THRESHOLD || GZ > GYRO_Z_THRESHOLD + THRESHOLD) || (AX < ACCEL_X_THRESHOLD - THRESHOLD || AX > ACCEL_X_THRESHOLD + THRESHOLD) || (AY < ACCEL_Y_THRESHOLD - THRESHOLD || AY > ACCEL_Y_THRESHOLD + THRESHOLD) || (AZ < ACCEL_Z_THRESHOLD - THRESHOLD || AZ > ACCEL_Z_THRESHOLD + THRESHOLD);
     if (NEW_STATE != DOOR_HANDLE_STATE) {
         DOOR_HANDLE_STATE = NEW_STATE;
         if (DOOR_HANDLE_STATE) {
@@ -139,5 +126,5 @@ void loop() {
             door_normal();
         }
     }
-    delay(200);
+    delAY(200);
 }

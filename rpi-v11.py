@@ -43,12 +43,7 @@ MAX_VOLTAGE = 3.3
 # Create single-ended input on channels
 ADC_0 = AnalogIn(ADS, ADS.P0)
 
-# MAC address of the HC-05 module
-ADDR = '00:14:01:21:11:08'
 
-# Create a Bluetooth socket and connect to the HC-05 module
-SOCK = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-SOCK.connect((ADDR, 1))
 
 ''' USER DEFINED FUNCTIONS '''
 # Callback function to be triggered when the switch is pressed
@@ -81,46 +76,7 @@ def read_pir():
 PIR_STATE = read_pir()
 
 
-# Bluetooth
-def start_bluetooth_server():
-    SERVER_SOCK = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-    SERVER_SOCK.bind(("", bluetooth.PORT_ANY))
-    SERVER_SOCK.listen(1)
-
-    PORT = SERVER_SOCK.getsockname()[1]
-
-    bluetooth.advertise_service(SERVER_SOCK, "BluetoothServer", service_id="", service_classes=[bluetooth.SERIAL_PORT_CLASS], profiles=[bluetooth.SERIAL_PORT_PROFILE])
-
-    print("Waiting for connection on RFCOMM channel %d" % PORT)
-
-    CLIENT_SOCK, CLIENT_INFO = SERVER_SOCK.accept()
-    print("Accepted connection from", CLIENT_INFO)
-
-    while True:
-        DATA = CLIENT_SOCK.recv(1024)
-        if len(DATA) == 0:
-            break
-        MESSAGE = DATA.decode('utf-8')
-        print("Received message: ", MESSAGE)
-        if MESSAGE.startswith("UPDATE"):
-            VALUES = MESSAGE.split(",")
-            VALUE1 = VALUES[1]
-            VALUE2 = VALUES[2]
-            VALUE3 = VALUES[3]
-            # do something with the values
-            RESPONSE = "Updated values: {}, {}, {}".format(VALUE1, VALUE2, VALUE3)
-            CLIENT_SOCK.send(RESPONSE.encode('utf-8'))
-        elif MESSAGE.startswith("READ"):
-            # read the data and send response
-            RESPONSE = "Data to send"
-            CLIENT_SOCK.send(RESPONSE.encode('utf-8'))
-
-    CLIENT_SOCK.close()
-    SERVER_SOCK.close()
-
-
-
-
+#
 ''' THINKSPEAK DASHBOARD '''
 # Thinkspeak
 WRITE_API_KEY = '87DDHFBW1S25FHVU'
